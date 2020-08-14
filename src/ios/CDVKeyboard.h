@@ -20,16 +20,17 @@
 #import <Cordova/CDVPlugin.h>
 
 @interface CDVKeyboard : CDVPlugin {
-    @protected
-    id _keyboardShowObserver, _keyboardHideObserver, _keyboardWillShowObserver, _keyboardWillHideObserver;
-    @protected
+   @protected
+    id _keyboardShowObserver, _keyboardHideObserver, _keyboardWillShowObserver,
+        _keyboardWillHideObserver;
+   @protected
     id _shrinkViewKeyboardWillChangeFrameObserver;
 }
 
-@property (readwrite, assign, nonatomic) BOOL shrinkView;
-@property (readwrite, assign, nonatomic) BOOL disableScrollingInShrinkView;
-@property (readwrite, assign, nonatomic) BOOL hideFormAccessoryBar;
-@property (readonly, assign, nonatomic) BOOL keyboardIsVisible;
+@property(readwrite, assign, nonatomic) BOOL shrinkView;
+@property(readwrite, assign, nonatomic) BOOL disableScrollingInShrinkView;
+@property(readwrite, assign, nonatomic) BOOL hideFormAccessoryBar;
+@property(readonly, assign, nonatomic) BOOL keyboardIsVisible;
 
 - (void)shrinkView:(CDVInvokedUrlCommand*)command;
 - (void)disableScrollingInShrinkView:(CDVInvokedUrlCommand*)command;
