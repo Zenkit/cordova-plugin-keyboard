@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="UTF-8" ?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     id="cordova-plugin-keyboard" version="1.2.0">
     <name>Keyboard</name>
@@ -8,7 +7,7 @@
     <keywords>cordova,keyboard</keywords>
 
     <engines>
-        <engine name="cordova" version=">=3.2.0" />
+        <engine name="cordova" version=">=4.0.0" />
     </engines>
 
     <js-module src="www/keyboard.js" name="keyboard">
@@ -31,12 +30,12 @@
         <config-file target="config.xml" parent="/*">
             <feature name="Keyboard">
                 <param name="android-package"
-                    value="org.apache.cordova.labs.keyboard.Keyboard"
-                    onload="true" />
+                    value="org.apache.cordova.labs.keyboard.KeyboardPlugin" />
+                <param name="onload" value="true" />
             </feature>
         </config-file>
 
-        <source-file src="src/android/Keyboard.java"
+        <source-file src="src/android/KeyboardPlugin.java"
             target-dir="src/org/apache/cordova/labs/keyboard" />
     </platform>
 </plugin>
