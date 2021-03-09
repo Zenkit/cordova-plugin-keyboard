@@ -181,25 +181,33 @@ static IMP WKOriginalImp;
 - (void)resizeView:(NSNotification *)notification {
     CGRect keyboardEnd =
         [[notification.userInfo valueForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
-    CGRect keyboardBegin =
-        [[notification.userInfo valueForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue];
 
     double duration =
         [[notification.userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
     UIViewAnimationCurve curve =
         [[notification.userInfo valueForKey:UIKeyboardAnimationCurveUserInfoKey] integerValue];
 
+    CGRect frame = self.webView.frame;
+    CGFloat maxHeight = self.webView.superview.frame.size.height;
+    id coordinateSpace = self.webView.window.screen.coordinateSpace;
+    CGFloat relativeFrameY =
+        [self.webView convertPoint:frame.origin toCoordinateSpace:coordinateSpace].y;
+    CGFloat keyboardY = [self.webView convertPoint:keyboardEnd.origin toView:nil].y;
+
+    // NOTE: We set the web view height to the y position of keyboard, 
+    // this should prevent an error in the calculation beeing carried over.
+    // (e.g. the view could already be changed because we call this with a delay)
+    // But we need to calculate the y position relative to the view position on the screem.
+    // (e.g. to account for the statusbar or the "Slide Over" multitask mode on iPads)
+    // We also don't allow the view to get height than it's superview, because this should never be valid.
+    CGFloat relativeKeyboardY = keyboardY - relativeFrameY;
+    CGFloat frameHeight = relativeKeyboardY > maxHeight ? maxHeight : relativeKeyboardY;
+    frame.size.height = frameHeight;
+
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:duration];
     [UIView setAnimationCurve:curve];
-
-    CGRect frame = self.webView.frame;
-    CGRect frameEnd = [self.webView convertRect:keyboardEnd toView:nil];
-    CGRect frameBegin = [self.webView convertRect:keyboardBegin toView:nil];
-
-    frame.size.height -= (frameBegin.origin.y - frameEnd.origin.y);
     self.webView.frame = frame;
-
     [UIView commitAnimations];
 }
 
