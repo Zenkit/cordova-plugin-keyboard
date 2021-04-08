@@ -178,35 +178,58 @@ static IMP WKOriginalImp;
 
 #pragma mark KeyboardShrinksView
 
-- (void)resizeView:(NSNotification *)notification {
-    CGRect keyboardEnd =
+- (CGFloat)calculateFrameHeight:(NSNotification *)notification {
+    UIScreen *screen = self.webView.window.screen;
+    CGFloat superviewFrameHeight = self.webView.superview.frame.size.height;
+    CGRect keyboardEndFrame =
         [[notification.userInfo valueForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+
+    // NOTE: Detect if the keyboard is attached or floating.
+    // If the keyboard is floating it's frame should not match the screen bounds.
+    BOOL keyboardAttached = screen.bounds.origin.x == keyboardEndFrame.origin.x &&
+                            screen.bounds.size.width == keyboardEndFrame.size.width;
+
+    // NOTE: If the keyboard is floating (not attached) we reset the view height.
+    if (keyboardAttached == NO) {
+        return superviewFrameHeight;
+    }
+
+    CGPoint keyboardOrigin = [self.webView convertPoint:keyboardEndFrame.origin toView:nil];
+    CGPoint relativeFrameOrigin = [self.webView convertPoint:self.webView.frame.origin
+                                           toCoordinateSpace:screen.coordinateSpace];
+
+    // NOTE: We set the web view height to the y position of keyboard,
+    // this should prevent an error in the calculation beeing carried over.
+    // (e.g. the view could already be changed because we call this with a delay)
+    // But we need to calculate the y position relative to the view position on the screem.
+    // (e.g. to account for the statusbar or the "Slide Over" multitask mode on iPads)
+    CGFloat relativeKeyboardY = keyboardOrigin.y - relativeFrameOrigin.y;
+
+    // NOTE: We don't allow the frame height to be smaller than 0 or bigger than the superview.
+    // If this happened we porbably calculated something wrong,
+    // in that case it is porbably better to reset the height.
+    if (relativeKeyboardY <= 0 || relativeKeyboardY > superviewFrameHeight) {
+        return superviewFrameHeight;
+    }
+    return relativeKeyboardY;
+}
+
+- (void)resizeView:(NSNotification *)notification {
+    CGRect frame = self.webView.frame;
+    CGFloat frameHeight = [self calculateFrameHeight:notification];
+    if (frame.size.height == frameHeight) {
+        return;
+    }
 
     double duration =
         [[notification.userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
     UIViewAnimationCurve curve =
         [[notification.userInfo valueForKey:UIKeyboardAnimationCurveUserInfoKey] integerValue];
 
-    CGRect frame = self.webView.frame;
-    CGFloat maxHeight = self.webView.superview.frame.size.height;
-    id coordinateSpace = self.webView.window.screen.coordinateSpace;
-    CGFloat relativeFrameY =
-        [self.webView convertPoint:frame.origin toCoordinateSpace:coordinateSpace].y;
-    CGFloat keyboardY = [self.webView convertPoint:keyboardEnd.origin toView:nil].y;
-
-    // NOTE: We set the web view height to the y position of keyboard, 
-    // this should prevent an error in the calculation beeing carried over.
-    // (e.g. the view could already be changed because we call this with a delay)
-    // But we need to calculate the y position relative to the view position on the screem.
-    // (e.g. to account for the statusbar or the "Slide Over" multitask mode on iPads)
-    // We also don't allow the view to get height than it's superview, because this should never be valid.
-    CGFloat relativeKeyboardY = keyboardY - relativeFrameY;
-    CGFloat frameHeight = relativeKeyboardY > maxHeight ? maxHeight : relativeKeyboardY;
-    frame.size.height = frameHeight;
-
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:duration];
     [UIView setAnimationCurve:curve];
+    frame.size.height = frameHeight;
     self.webView.frame = frame;
     [UIView commitAnimations];
 }
