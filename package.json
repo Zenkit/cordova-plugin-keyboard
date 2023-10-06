@@ -1,5 +1,5 @@
 {
-  "name": "@zenkit/cordova-plugin-keyboard",
+  "name": "@zenkit-dev/cordova-plugin-keyboard",
   "version": "1.2.0-dev.0",
   "description": "Cordova Keyboard Plugin",
   "cordova": {
@@ -9,9 +9,6 @@
     ]
   },
   "repository": "https://github.com/zenkit/cordova-plugin-keyboard.git",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "keywords": [
     "cordova",
     "keyboard",
