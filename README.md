@@ -1,3 +1,5 @@
+> ⚠️ **This project is no longer maintained.**
+
 # cordova-plugin-keyboard
 
 > This plugin provides the `Keyboard` object which has some functions to customize and control the keyboard. It also supports the __HideKeyboardFormAccessoryBar__ (boolean) and __KeyboardShrinksView__ (boolean) preferences in config.xml.
@@ -293,4 +295,7 @@ Attach handler to this event to be able to receive notification when keyboard is
     - Return current values of shrinkView, disableScroll and hideFormAccessoryBar in a success callback
     - Fix scroller resizing bug (See [#55](/../../issues/55))
     - Fix iOS 11.1.1 WKWebView ShrinksView bug (See [#64](/../../issues/64))
+- 1.3.0
+    - Fix support for iPad split screen (See [#72](/../../issues/72))
+    - Use `cordova.plugins.Keyboard` as the primary namespace (See [#75](/../../issues/75))
 
